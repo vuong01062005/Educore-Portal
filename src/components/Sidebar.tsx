@@ -122,7 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             />
             <div className="flex flex-col min-w-0">
               <span className="text-sm font-semibold text-[#e3e2e6] truncate leading-tight">
-                Nguyễn Văn An
+                Trịnh Đình Vượng
               </span>
               <span className="text-[11px] text-[#8c909f] truncate leading-tight mt-0.5">
                 Quản trị viên / Đào tạo
