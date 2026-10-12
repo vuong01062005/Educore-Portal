@@ -48,7 +48,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
               <span className="text-xs text-[#8c909f]">Kỳ học 2024-2025 (HK2)</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-[#e3e2e6] tracking-tight mt-1">
-              Xin chào, Quản trị viên Nguyễn Văn An! 👋
+              Xin chào, Quản trị viên Trịnh Đình Vượng! 👋
             </h1>
             <p className="text-sm text-[#8c909f] max-w-2xl leading-relaxed">
               Chào mừng quay trở lại cổng quản trị EduCore. Hiện tại có 98.4% hồ sơ sinh viên đã hoàn tất thủ tục kỳ mới.
