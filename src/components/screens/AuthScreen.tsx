@@ -10,8 +10,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   onTriggerToast,
 }) => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
-  const [loginEmail, setLoginEmail] = useState('admin@educore.edu.vn');
-  const [loginPassword, setLoginPassword] = useState('EducationPortal@2025');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,22 +28,46 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const logoUrl =
     'https://lh3.googleusercontent.com/aida/AEtjO1VjdkqJZTshV5KyuCY-wHTu41BVs9REJ-HP_ibNVtgc0sM2xV2yeFySwWtICCrwDGraoukDsWMCK-tXjvnvx-VlnkhiG9LkLAa1pSKXLrXeGyia0NOWDhGpUtXuya8llqsmcfuCC6Mo0IfSIYwGwColqF9D0wiV_oHCZPQMckKQNILZWKhak39DsibOS0hTo7JQgU93ifi5f5z2ikL3K5WfR-nNbqJamIM2DOpRbW-3qaiZ59rPPlfS4w';
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    onTriggerToast(
-      'Đăng nhập thành công!',
-      'Đang kết nối phiên làm việc và chuyển hướng đến Dashboard...'
-    );
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: loginEmail,
+          password: loginPassword,
+          rememberMe,
+        }),
+      });
+      const data = await res.json();
 
-    setTimeout(() => {
+      if (!res.ok) {
+        onTriggerToast('Đăng nhập thất bại', data.error || 'Đã có lỗi xảy ra.', true);
+        return;
+      }
+
+      onTriggerToast(
+        'Đăng nhập thành công!',
+        `Xin chào ${data.fullName}, đang chuyển hướng đến Dashboard...`
+      );
+      setTimeout(() => onLoginSuccess(), 800);
+    } catch {
+      onTriggerToast('Lỗi kết nối', 'Không thể kết nối tới máy chủ.', true);
+    } finally {
       setIsLoading(false);
-      onLoginSuccess();
-    }, 1200);
+    }
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (regPassword.length < 8) {
+      onTriggerToast('Mật khẩu quá ngắn', 'Mật khẩu phải có ít nhất 8 ký tự.', true);
+      return;
+    }
+
     if (regPassword !== regConfirmPassword) {
       onTriggerToast(
         'Lỗi xác nhận',
@@ -62,10 +86,35 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     }
 
     setIsLoading(true);
-    onTriggerToast(
-      'Đăng ký hoàn tất',
-      'Tài khoản hồ sơ sinh viên đã được tạo. Vui lòng đăng nhập để tiếp tục.'
-    );
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: regFullName,
+          email: regEmail,
+          password: regPassword,
+        }),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        onTriggerToast('Đăng ký thất bại', data.error || 'Đã có lỗi xảy ra.', true);
+        return;
+      }
+      onTriggerToast(
+        'Đăng ký hoàn tất',
+        'Tài khoản hồ sơ sinh viên đã được tạo. Vui lòng đăng nhập để tiếp tục.'
+      );
+
+      setActiveTab('login');
+      setLoginEmail(regEmail);
+      setLoginPassword('');
+    } catch {
+      onTriggerToast('Lỗi kết nối', 'Không thể kết nối tới máy chủ.', true);
+    } finally {
+      setIsLoading(false);
+    }
 
     setTimeout(() => {
       setIsLoading(false);
